@@ -12,7 +12,7 @@
 {% block content %}
 
 <div id="navigation"
-     {% if user.is_authenticated %}
+     {% if user.is_superuser %}
      ondblclick="document.location = '{% url 'entry_update' child.pk %}?next={{ path_clean|urlencode }}%3Fe%3D{{ entry.pk }}%26c%3D{{ child.pk }}'"
 	 {% endif %}
      >
@@ -31,8 +31,8 @@
 	  </div>
 	  <form class="form-inline" method="GET" action="{% url 'home' %}">
 	    <input class="form-control form-control-sm mr-sm-1" type="text" name="q" placeholder="Search" aria-label="Search" />
-	    <button class="btn btn-sm btn-secondary mr-sm-{% if user.is_authenticated %}1{% else %}3{% endif %}" type="submit"><i class="fas fa-search"></i></button>
-	    {% if user.is_authenticated %}
+	    <button class="btn btn-sm btn-secondary mr-sm-{% if user.is_superuser %}1{% else %}3{% endif %}" type="submit"><i class="fas fa-search"></i></button>
+	    {% if user.is_superuser %}
 	    <a class="btn btn-sm btn-secondary mr-sm-3" href="{% url 'entry_create' %}"><i class="fas fa-plus"></i></a>
 	    {% endif %}
 	  </form>
@@ -43,7 +43,7 @@
 	    <div class="col-3 navigation-child-list" id="navigation-children">
 
 	    	<h4>{{ entry.name_get_no_name_prefix }}
-		    	{% if user.is_authenticated %}
+		    	{% if user.is_superuser %}
 		    	<a class="btn btn-sm btn-secondary float-right" href="{% url 'entry_create' %}?parent={{ entry.pk }}&next={{ path_entry|urlencode }}"><i class="fas fa-plus"></i></a>
 		    	{% endif %}
 	    	</h4>
@@ -134,7 +134,7 @@ $(document).ready(function() {
 
 </script>
 
-{% if user.is_authenticated %}
+{% if user.is_superuser %}
 {% include "core/bootstrap_table_reorder.html" %}
 {% endif %}
 

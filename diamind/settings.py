@@ -19,11 +19,13 @@ STATIC_URL  = "/static/"
 MEDIA_ROOT  = os.path.join(BASE_DIR, 'media')
 MEDIA_URL   = "/media/"
 
+LOGIN_URL = '/admin/login/'
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = ''
+SECRET_KEY = '^cpzt+-gj=*+(dj^9b9jp^+*n19(38-&41dotl0^defb&&gv%@'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -132,7 +134,6 @@ MARKDOWNX_MARKDOWN_EXTENSIONS = [
     'markdown.extensions.extra',
     'markdown.extensions.nl2br',
     'pyembed.markdown',
-    # 'mdx_oembed',
     'pymdownx.magiclink',
 ]
 

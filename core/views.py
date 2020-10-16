@@ -11,6 +11,7 @@ from dal import autocomplete
 from core.models import EntryParentThroughModel, Entry
 
 
+@login_required
 def home(request):
 
     q = request.GET.get('q')
@@ -27,6 +28,7 @@ def home(request):
                                               'search_results': search_results})
 
 
+@login_required
 def nav(request, path, slide=False):
 
     path_entries = []
@@ -341,6 +343,8 @@ class EntryAutocomplete(autocomplete.Select2QuerySetView):
 @login_required
 def entry_create(request):
 
+    if not request.user.is_superuser: return HttpResponseForbidden('403 - Forbidden')
+
     nxt = request.GET.get('next', None)
     if not nxt: nxt = request.POST.get('next', None)
 
@@ -380,6 +384,8 @@ def entry_create(request):
 
 @login_required
 def entry_update(request, pk):
+
+    if not request.user.is_superuser: return HttpResponseForbidden('403 - Forbidden')
 
     nxt = request.GET.get('next', None)
     if not nxt: nxt = request.POST.get('next', None)
@@ -421,6 +427,8 @@ def entry_update(request, pk):
 
 @login_required
 def entry_delete(request, pk): # FIXME: CSRF
+
+    if not request.user.is_superuser: return HttpResponseForbidden('403 - Forbidden')
 
     nxt   = request.GET.get('next', None)
     entry = get_object_or_404(Entry, pk=pk)

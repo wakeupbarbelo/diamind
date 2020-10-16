@@ -1,5 +1,5 @@
-<table class="table table-bordered entry-list{% if user.is_authenticated %} bootstrap-table-reorder-ajax bootstrap-table-reorder-ajax{% endif %}"
-       {% if user.is_authenticated %}
+<table class="table table-bordered entry-list{% if user.is_superuser %} bootstrap-table-reorder-ajax bootstrap-table-reorder-ajax{% endif %}"
+       {% if user.is_superuser %}
        data-reorderable-rows="true"
        data-use-row-attr-func="true"
        data-reorderable-ajax-url="{{ path_clean }}?e={{ entry.pk }}&c={{ child.pk }}&children&children_position="
@@ -19,7 +19,7 @@
 				{% if c.children.all.count %}<i class="far fa-folder{% if c == child %}-open{% endif %}"></i>{% endif %}
 				{% if c.name_prefix == entry %}{{ c.span_no_name_prefix }}{% else %}{{ c.span }}{% endif %}
 				</a>
-				{% if user.is_authenticated and c == child %}
+				{% if user.is_superuser and c == child %}
 				<a href="{% url 'entry_create' %}?parent={{ child.pk }}&next={{ path_clean|urlencode }}"><i class="fas fa-plus-square"></i></a>
 				{% endif %}
 
