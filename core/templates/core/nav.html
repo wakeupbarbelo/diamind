@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block head_extra %}
+{% endblock %}
+
+{% block title %}{{ entry.name_get }}{% if entry != child %} → {% if child.name_prefix != entry %}{{ child.name_get }}{% else %}{{ child.name_get_no_name_prefix }}{% endif %}{% endif %}{% endblock %}
+
+{% block content_classes %} page-navigation{% endblock %}
+
+{% block content %}
+
+<div id="navigation"
+     {% if user.is_authenticated %}
+     ondblclick="document.location = '{% url 'entry_update' child.pk %}?next={{ path_clean|urlencode }}%3Fe%3D{{ entry.pk }}%26c%3D{{ child.pk }}'"
+	 {% endif %}
+     >
+
+	<nav class="navbar navbar-expand-md navbar-dark indigo mb-5">
+	  <div class="mr-auto">
+	    <nav aria-label="breadcrumb">
+	      <!-- <ol class="breadcrumb clearfix d-none d-md-inline-flex pt-0" style="background-color: transparent !important;"> -->
+	      <ol class="breadcrumb" style="">
+		    <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i></a></li>
+		    {% for e in path_entries %}
+		    <li class="breadcrumb-item{% if e.entry == entry %} active{% elif e.entry == child %} active-child{% endif %}"><a href="{{ e.path }}">{{ e.span }}</a></li>
+		    {% endfor %}
+	      </ol>
+	    </nav>
+	  </div>
+	  <form class="form-inline" method="GET" action="{% url 'home' %}">
+	    <input class="form-control form-control-sm mr-sm-1" type="text" name="q" placeholder="Search" aria-label="Search" />
+	    <button class="btn btn-sm btn-secondary mr-sm-{% if user.is_authenticated %}1{% else %}3{% endif %}" type="submit"><i class="fas fa-search"></i></button>
+	    {% if user.is_authenticated %}
+	    <a class="btn btn-sm btn-secondary mr-sm-3" href="{% url 'entry_create' %}"><i class="fas fa-plus"></i></a>
+	    {% endif %}
+	  </form>
+	</nav>
+
+	<div id="navigation-horiz">
+	  <div class="row">
+	    <div class="col-3 navigation-child-list" id="navigation-children">
+
+	    	<h4>{{ entry.name_get_no_name_prefix }}
+		    	{% if user.is_authenticated %}
+		    	<a class="btn btn-sm btn-secondary float-right" href="{% url 'entry_create' %}?parent={{ entry.pk }}&next={{ path_entry|urlencode }}"><i class="fas fa-plus"></i></a>
+		    	{% endif %}
+	    	</h4>
+
+	    	<div>    		
+		    	{% if entry_children %}{% include "core/nav_children.html" %}{% endif %}
+	    	</div>
+
+	    	{% if entry_parents %}
+	    	<div>
+		    	<!-- <h5><i class="fas fa-random fa-mirror"></i> / <i class="far fa-folder-open"></i> other parents:</h5> -->
+				<table class="table table-bordered entry-list">
+					<tbody>
+						{% for p in entry_parents %}
+						<tr data-pk="{{ p.entry.pk }}"{% if p.entry == child %} class="active"{% endif %}>
+							<td>
+								<a href="{{ p.path }}"><i class="fas fa-random fa-mirror"></i>&nbsp;<i class="far fa-folder-open"></i> {{ p.entry.span }}</a>
+							</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+	    	</div>
+	    	{% endif %}
+
+	    	{% if entry_tags.count %}
+	    	<div class="navigation-tags">
+		    	<h5><i class="fas fa-tags"></i> tags:</h5>
+		    	<div>
+		    	{% for tag in entry_tags.all %}{{ tag.badge }} {% endfor %}
+		    	</div>
+	    	</div>
+	    	{% endif %}
+
+	    	{% if entry_tagged_from.count %}
+	    	<div class="navigation-tags">
+		    	<h5><i class="fas fa-tags"></i> tagged from:</h5>
+		    	<div>
+		    	{% for tag in entry_tagged_from.all %}{{ tag.badge }} {% endfor %}
+		    	</div>
+	    	</div>
+	    	{% endif %}
+
+	    </div>
+	    <div class="col-9" id="navigation-child">
+	    	{% include "core/entry_content.html" %}
+	    </div>
+
+	    <!-- <div class="col-2 navigation-child-list" id="navigation-child-children"></div> -->
+	  </div>
+	</div>
+
+</div>
+
+<script type="text/javascript">
+
+$(document).ready(function() {
+
+	var ﻿nc        = $('#navigation-child');
+	var ﻿ncs       = $('#navigation-children');
+	var ﻿nct       = $('#navigation-child-tags');
+	var tr_active = $(".navigation-child-list tr.active");
+
+	function nct_refresh() {
+		if (nc[0].scrollHeight > nc.height()+1 && !nc.scrollTop()) {
+
+			if($('.navigation-child-tags-fixed').length) return;
+
+			var nct_top = nct.clone();
+			nct_top.addClass('navigation-child-tags-fixed');
+			nct.css('visibility', 'hidden');
+			nc.append(nct_top);
+
+		} else {
+
+			$('.navigation-child-tags-fixed').remove();
+			nct.css('visibility', 'visible');
+		}
+	}
+
+	nct_refresh();
+
+	nc.scroll(function(e) { nct_refresh(); });
+	$( window ).resize(function() { nct_refresh(); });
+
+	if(tr_active.length) ncs.animate({scrollTop: tr_active.offset().top });
+});
+
+</script>
+
+{% if user.is_authenticated %}
+{% include "core/bootstrap_table_reorder.html" %}
+{% endif %}
+
+{% endblock %}
