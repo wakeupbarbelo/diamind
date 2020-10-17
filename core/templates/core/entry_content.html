@@ -37,7 +37,7 @@
 		    </video>
 		</div>
 		{% endif %}
-		{% if not slide %}<a href="{{ child.file.url }}">{{ child.file_filename }}</a>{% endif %}
+		{% if not slide %}<div><a href="{{ child.file.url }}">{{ child.file_filename }}</a> ({{ child.file.size|filesizeformat }})</div>{% endif %}
 	</div>
 	{% endif %}
 
