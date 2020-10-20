@@ -7,7 +7,8 @@
 
 {% block form %}
 
-{% if parent %}<h2>Parent: {{ parent.span }}</h2>{% endif %}
+{% if parent %}<h2>Parent <i class="fas fa-exchange-alt" onclick="parent_tag_switch();"></i>: {{ parent.span }}</h2>{% endif %}
+{% if tag %}<h2>Tag <i class="fas fa-exchange-alt" onclick="parent_tag_switch();"></i>: {{ tag.span }}</h2>{% endif %}
 
 <form method="post" enctype="multipart/form-data" action="." ondblclick="this.submit();">
 {% csrf_token %}
@@ -31,5 +32,18 @@
 {% bootstrap_button form_action button_type="submit" button_class="btn-primary" title="Or double-click on the form." %}
 </form>
 {{ form.media }}
+
+<script type="text/javascript">
+function parent_tag_switch() {
+	var params = new URLSearchParams(window.location.search);
+	var orig   = '{% if parent %}parent{% else %}tag{% endif %}';
+	var dest   = '{% if parent %}tag{% else %}parent{% endif %}';
+	var value  = params.get(orig);
+	params.delete(orig);
+	params.set(dest, value);
+	document.location = document.location.pathname+'?'+decodeURIComponent(params.toString());
+	// console.log(params.toString());
+}
+</script>
 
 {% endblock %}

@@ -340,3 +340,10 @@ a.btn i {
 	display: inline-block;
 	margin-right: 1rem;
 }
+
+.page-form.page-entry h2 .fas {
+	cursor: pointer;
+    vertical-align: 100%;
+    font-size: 1rem;
+    margin-right: 0.3rem;
+}

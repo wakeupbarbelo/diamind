@@ -292,6 +292,11 @@ class EntryParentForm(ModelForm):
         model  = Entry
         fields = ('name', 'name_prefix_bool', 'aka', 'text' ,'file', 'image', 'home',)
 
+class EntryTagForm(EntryParentForm):
+
+    name_prefix_bool = BooleanField(required=False, label="Tag name prefix",
+                                    help_text="Use tag's name as prefix when displayed out of context.")
+
 
 class EntryParentThroughForm(ModelForm):
 
@@ -354,14 +359,19 @@ def entry_create(request):
     parent = Entry.objects.filter(pk=request.GET.get('parent')).last()
     if parent == None: parent = Entry.objects.filter(pk=request.POST.get('parent')).last()
 
+    tag = Entry.objects.filter(pk=request.GET.get('tag')).last()
+    if tag == None: tag = Entry.objects.filter(pk=request.POST.get('tag')).last()
+
     if 'home' in request.GET: initial['home'] = True
 
     if parent: form = EntryParentForm(initial=initial)
+    elif tag:  form = EntryTagForm(initial=initial)
     else:      form = EntryForm(initial=initial)
 
     if request.method == 'POST':
 
         if parent: form = EntryParentForm(request.POST, request.FILES)
+        elif tag:  form = EntryTagForm(request.POST, request.FILES)
         else:      form = EntryForm(request.POST, request.FILES)
 
         if form.is_valid():
@@ -369,6 +379,7 @@ def entry_create(request):
             entry = form.save()
 
             if parent: entry.parents.add(parent)
+            if tag:    entry.tags.add(tag)
 
             if 'name_prefix_bool' in request.POST:
 
@@ -380,7 +391,7 @@ def entry_create(request):
             else:
                 return redirect(reverse('nav', kwargs={'path': entry.pk}))
 
-    return render(request, 'core/entry_create.html', {'form': form, 'form_action': 'Create', 'next': nxt, 'parent': parent})
+    return render(request, 'core/entry_create.html', {'form': form, 'form_action': 'Create', 'next': nxt, 'parent': parent, 'tag': tag})
 
 
 @login_required
