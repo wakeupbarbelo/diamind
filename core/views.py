@@ -380,9 +380,11 @@ def entry_create(request):
 
             if parent: entry.parents.add(parent)
             elif tag:  entry.tags.add(tag)
-
+            print(request.GET)
+            print(request.POST)
             if 'name_prefix_bool' in request.POST:
 
+                print(parent, tag)
                 if parent: entry.name_prefix = parent
                 elif tag:  entry.name_prefix = tag
 

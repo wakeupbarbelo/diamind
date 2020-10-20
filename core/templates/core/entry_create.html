@@ -13,6 +13,7 @@
 <form method="post" enctype="multipart/form-data" action="." ondblclick="this.submit();">
 {% csrf_token %}
 {% if parent %}<input type="hidden" name="parent" value="{{ parent.pk }}" />{% endif %}
+{% if tag %}<input type="hidden" name="tag" value="{{ tag.pk }}" />{% endif %}
 {% bootstrap_form form layout='horizontal' %}
 <input class="col" type="hidden" name="next" value="{{ next }}">
 
