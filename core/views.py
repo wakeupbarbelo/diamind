@@ -379,11 +379,13 @@ def entry_create(request):
             entry = form.save()
 
             if parent: entry.parents.add(parent)
-            if tag:    entry.tags.add(tag)
+            elif tag:  entry.tags.add(tag)
 
             if 'name_prefix_bool' in request.POST:
 
-                entry.name_prefix = parent
+                if parent: entry.name_prefix = parent
+                elif tag:  entry.name_prefix = tag
+
                 entry.save()
 
             if parent and nxt != None:
