@@ -191,6 +191,7 @@ a.btn i {
 	margin-right: auto;
     margin-left: auto;
     display: block;
+    background-color: gray;
 }
 
 .navigation-child-list {
