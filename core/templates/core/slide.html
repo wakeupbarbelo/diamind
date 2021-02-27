@@ -11,7 +11,7 @@
 
 {% block content %}
 
-<div class="alert alert-secondary" role="alert">You are in slideshow mode, press "Enter" to go back to navigation, "Arrow Down" for next slide "Arrow Up" for rewind.</div>
+<div class="alert alert-secondary" role="alert">You are in slideshow mode, press "Enter" to go back to navigation, "Page Down" for next slide "Page Up" for rewind.</div>
 
 {% include "core/entry_content.html" %}
 
@@ -66,11 +66,11 @@ $(document).ready(function() {
 	    	window.location = '{{ path_nav|safe }}';
 	    }
 
-	    else if (evt.key === 'ArrowDown') {
+	    else if (evt.key === 'PageDown') {
 	    	next_slide();
 	    }
 
-	    else if (evt.key === 'ArrowUp') {
+	    else if (evt.key === 'PageUp') {
 
 	    	if($('.entry-content').length <= 1) return;
 

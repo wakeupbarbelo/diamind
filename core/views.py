@@ -155,7 +155,8 @@ def nav(request, path, slide=False):
 
     entry_next = {}
 
-    if slide:
+    if True:
+    # if slide:
 
         tree_root_entry           = path_entries[0]['entry']
         tree_entries              = {tree_root_entry}
@@ -220,11 +221,9 @@ def nav(request, path, slide=False):
 
         if entry_next_list:
             entry_next_path = '/'.join(map(lambda x: str(x.pk), entry_next_list))
-            entry_next_path = reverse('slide', kwargs={'path': entry_next_path})
+            entry_next_path = reverse('slide' if slide else 'nav', kwargs={'path': entry_next_path})
             entry_next_path = '%s/?e=%s' % (entry_next_path, entry_next_list[-1].pk,)
             entry_next      = {'path': entry_next_path, 'through': entry_next_through}
-
-        # print(entry_next_through, entry_next_through.pk)
 
     context = {'slide':             slide,
                'path_entries':      path_entries,
@@ -380,8 +379,7 @@ def entry_create(request):
 
             if parent: entry.parents.add(parent)
             elif tag:  entry.tags.add(tag)
-            print(request.GET)
-            print(request.POST)
+
             if 'name_prefix_bool' in request.POST:
 
                 print(parent, tag)

@@ -130,6 +130,13 @@ $(document).ready(function() {
 	$( window ).resize(function() { nct_refresh(); });
 
 	if(tr_active.length) ncs.animate({scrollTop: tr_active.offset().top });
+
+	{% if entry_next.path %}
+	document.onkeydown = function(evt) { if (evt.key === 'PageDown') {
+	    	document.location = '{{ entry_next.path }}';
+	    }
+	};
+	{% endif %}
 });
 
 </script>
