@@ -131,12 +131,16 @@ $(document).ready(function() {
 
 	if(tr_active.length) ncs.animate({scrollTop: tr_active.offset().top });
 
-	{% if entry_next.path %}
-	document.onkeydown = function(evt) { if (evt.key === 'PageDown') {
+	document.onkeydown = function(evt) {
+		if (evt.key === 'PageUp') {
+			history.back();
+		}
+		{% if entry_next.path %}
+		else if (evt.key === 'PageDown') {
 	    	document.location = '{{ entry_next.path }}';
 	    }
+		{% endif %}
 	};
-	{% endif %}
 });
 
 </script>
