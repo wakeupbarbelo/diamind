@@ -342,7 +342,11 @@ class EntryAutocomplete(autocomplete.Select2QuerySetView):
 
             if qs_kw != None: qs = qs_kw
 
-        return qs.distinct()
+        qs = qs.distinct()
+        qs = qs.annotate(popular_in=models.Count('children')+models.Count('tagged_from'), popular_out=models.Count('parents')+models.Count('tags'))
+        qs = qs.order_by('-popular_in', '-popular_out')
+
+        return qs
 
 
 @login_required
