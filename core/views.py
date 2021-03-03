@@ -73,14 +73,16 @@ def nav(request, path, slide=False, prompt=False):
     if not path_e: path_e = path_entries[-1]['path']
     if not child:  child  = entry
 
-    path_e     = reverse('nav',   kwargs={'path': path_e})
-    path_clean = reverse('nav',   kwargs={'path': path_current})
-    path_nav   = path_clean
-    path_slide = reverse('slide', kwargs={'path': path_current})
+    path_e      = reverse('nav',   kwargs={'path': path_e})
+    path_clean  = reverse('nav',   kwargs={'path': path_current})
+    path_nav    = path_clean
+    path_slide  = reverse('slide', kwargs={'path': path_current})
+    path_prompt = reverse('prompt', kwargs={'path': path_current})
 
     if request.META['QUERY_STRING'] != '':
-        path_nav   = '%s?%s' % (path_nav,   request.META['QUERY_STRING'],)
-        path_slide = '%s?%s' % (path_slide, request.META['QUERY_STRING'],)
+        path_nav    = '%s?%s' % (path_nav,    request.META['QUERY_STRING'],)
+        path_slide  = '%s?%s' % (path_slide,  request.META['QUERY_STRING'],)
+        path_prompt = '%s?%s' % (path_prompt, request.META['QUERY_STRING'],)
 
     child_parent          = None
     entry_parent          = None
@@ -230,6 +232,7 @@ def nav(request, path, slide=False, prompt=False):
                'path_clean':        path_clean,
                'path_nav':          path_nav,
                'path_slide':        path_slide,
+               'path_prompt':       path_prompt,
                'path_entry':        path_e,
                'entry':             entry,
                'entry_children':    entry_children,
