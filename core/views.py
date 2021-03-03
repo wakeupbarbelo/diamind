@@ -30,7 +30,7 @@ def home(request):
 
 
 @login_required
-def nav(request, path, slide=False):
+def nav(request, path, slide=False, prompt=False):
 
     path_entries = []
     entries_raw  = []
@@ -143,6 +143,7 @@ def nav(request, path, slide=False):
     elif slide:
         if 'entry_content' in request.GET: template = 'core/entry_content.html'
         else: template = 'core/slide.html'
+    elif prompt: template = 'core/prompt.html'
     else: template = 'core/nav.html'
 
     entry_children = []
@@ -155,75 +156,74 @@ def nav(request, path, slide=False):
 
     entry_next = {}
 
-    if True:
-    # if slide:
+    tree_root_entry           = path_entries[0]['entry']
+    tree_entries              = {tree_root_entry}
+    tree_entries_flat         = []
+    path_entries_to_child_raw = list(map(lambda x: x['entry'], path_entries_to_child))
 
-        tree_root_entry           = path_entries[0]['entry']
-        tree_entries              = {tree_root_entry}
-        tree_entries_flat         = []
-        path_entries_to_child_raw = list(map(lambda x: x['entry'], path_entries_to_child))
+    def tree_rec(e, l=[]):
 
-        def tree_rec(e, l=[]):
+        l.append(e)
+        tree_entries_flat.append(l)
 
-            l.append(e)
-            tree_entries_flat.append(l)
+        q = e.children.all().order_by('parents_through__order', 'children_through__order',)
 
-            q = e.children.all().order_by('parents_through__order', 'children_through__order',)
+        # if not q.count(): return
 
-            # if not q.count(): return
+        appended = [] # Quick fix for OrderedModel .distinct() fail.
 
-            appended = [] # Quick fix for OrderedModel .distinct() fail.
+        for c in q:
+            if c in appended: continue
+            appended.append(c)
+            # new = not c in tree_entries
+            # tree_entries.add(c)
+            # if new: tree_rec(c, l.copy())
+            tree_rec(c, l.copy())
 
-            for c in q:
-                if c in appended: continue
-                appended.append(c)
-                # new = not c in tree_entries
-                # tree_entries.add(c)
-                # if new: tree_rec(c, l.copy())
-                tree_rec(c, l.copy())
+    tree_rec(tree_root_entry)
 
-        tree_rec(tree_root_entry)
+    # def tree_rec(e, l=[]):
 
-        # def tree_rec(e, l=[]):
+    #     tree_entries_flat.append(l)
 
-        #     tree_entries_flat.append(l)
+    #     q = e.children.all().order_by('parents_through__order', 'children_through__order',)
 
-        #     q = e.children.all().order_by('parents_through__order', 'children_through__order',)
+    #     appended = [] # Quick fix for OrderedModel .distinct() fail.
 
-        #     appended = [] # Quick fix for OrderedModel .distinct() fail.
+    #     for c in q:
+    #         if c in appended: continue
+    #         appended.append(c)
+    #         l_new = l.copy()
+    #         l_new.append(c)
+    #         tree_rec(c, l_new)
 
-        #     for c in q:
-        #         if c in appended: continue
-        #         appended.append(c)
-        #         l_new = l.copy()
-        #         l_new.append(c)
-        #         tree_rec(c, l_new)
+    # tree_rec(tree_root_entry, [tree_root_entry])
 
-        # tree_rec(tree_root_entry, [tree_root_entry])
+    entry_next_index   = tree_entries_flat.index(path_entries_to_child_raw)+1
+    entry_next_through = None
 
-        entry_next_index   = tree_entries_flat.index(path_entries_to_child_raw)+1
-        entry_next_through = None
+    if entry_next_index < len(tree_entries_flat):
 
-        if entry_next_index < len(tree_entries_flat):
+        entry_next_list = tree_entries_flat[entry_next_index]
 
-            entry_next_list = tree_entries_flat[entry_next_index]
+        through_get_kwargs = {'child': entry_next_list[-1]}
+        if len(entry_next_list) > 1: through_get_kwargs['parent'] = entry_next_list[-2]
+        entry_next_through = EntryParentThroughModel.objects.get(**through_get_kwargs)
 
-            through_get_kwargs = {'child': entry_next_list[-1]}
-            if len(entry_next_list) > 1: through_get_kwargs['parent'] = entry_next_list[-2]
-            entry_next_through = EntryParentThroughModel.objects.get(**through_get_kwargs)
+    else: entry_next_list = None
 
-        else: entry_next_list = None
+    # i = 0
+    # for e in tree_entries_flat: 
+    #     print(i, e)
+    #     i += 1
 
-        # i = 0
-        # for e in tree_entries_flat: 
-        #     print(i, e)
-        #     i += 1
+    if entry_next_list:
+        entry_next_path = '/'.join(map(lambda x: str(x.pk), entry_next_list))
+        entry_next_path = reverse('slide' if slide else 'nav', kwargs={'path': entry_next_path})
+        entry_next_path = '%s/?e=%s' % (entry_next_path, entry_next_list[-1].pk,)
+        entry_next      = {'path': entry_next_path, 'through': entry_next_through}
 
-        if entry_next_list:
-            entry_next_path = '/'.join(map(lambda x: str(x.pk), entry_next_list))
-            entry_next_path = reverse('slide' if slide else 'nav', kwargs={'path': entry_next_path})
-            entry_next_path = '%s/?e=%s' % (entry_next_path, entry_next_list[-1].pk,)
-            entry_next      = {'path': entry_next_path, 'through': entry_next_through}
+    narration = map(lambda e: e[-1], tree_entries_flat)
 
     context = {'slide':             slide,
                'path_entries':      path_entries,
@@ -244,6 +244,7 @@ def nav(request, path, slide=False):
                'child_tags':        child.tags.all().order_by('name'),
                'child_tagged_from': child.tagged_from.all().order_by('name'),
                'entry_next':        entry_next,
+               'narration':         narration
               }
 
     return render(request, template, context)

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block head_extra %}
+{% endblock %}
+
+{% block title %}Teleprompter{% endblock %}
+
+{% block content_classes %} page-prompt{% endblock %}
+
+{% block content %}
+
+{% for e in narration %}
+	{% if e.text.strip != '' %}
+	<div class="entry-content">
+		<div class="entry-content-markdown">
+		{{ e.text_html }}
+		</div>
+	</div>
+	{% endif %}
+{% endfor %}
+
+{% endblock %}
